@@ -23,28 +23,24 @@ export function drawRect(ctx, x, y, angle){
     ctx.restore();
 }
 
-export function draw(canvas,gunimg,json){
-
-    var width = canvas.width;
-    var height = canvas.height;
-    var ctx = canvas.getContext("2d");
+export function draw(canvas,ctx,json){
+    let width = canvas.width;
+    let height = canvas.height;
     ctx.fillStyle = "#F0F0F0";
-    ctx.fillRect(0,0,width,height);
-    gunimg.onload = function(){
-        ctx.drawImage(gunimg, width-100,height/2-50,100,100);
-        drawCircle(ctx,width-100,height/2,10,2)
-        for(var i = 0;i<json.ballooninfo.hitnum;i++){
-            drawCircle(ctx,json.ballooninfo.hit[i].x,json.ballooninfo.hit[i].y,20,true);
-        }
-        for(var i = 0;i<json.ballooninfo.num - json.ballooninfo.hitnum ;i++){
-            drawCircle(ctx,json.ballooninfo.alive[i].x,json.ballooninfo.alive[i].y,20,false);
-        }
-        ctx.beginPath();
-        ctx.moveTo(width-100,height/2);
-        ctx.lineTo(0,height/2);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "red"
-        ctx.stroke();
-        ctx.closePath();
+    ctx.fillRect(0, 0, width, height);
+    // ctx.drawImage(gunimg, width-100,height/2-50,100,100);
+    drawCircle(ctx, width - 100, height / 2, 10, 2)
+    for (var i = 0; i < json.ballooninfo.hitnum; i++) {
+      drawCircle(ctx, json.ballooninfo.hit[i].x, json.ballooninfo.hit[i].y, 20, true);
     }
+    for (var i = 0; i < json.ballooninfo.num - json.ballooninfo.hitnum; i++) {
+      drawCircle(ctx, json.ballooninfo.alive[i].x, json.ballooninfo.alive[i].y, 20, false);
+    }
+    ctx.beginPath();
+    ctx.moveTo(width - 100, height / 2);
+    ctx.lineTo(0, height / 2);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "red"
+    ctx.stroke();
+    ctx.closePath();
 }
