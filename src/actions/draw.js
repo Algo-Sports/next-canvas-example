@@ -1,3 +1,24 @@
+
+class Circle {
+    constructor(x, y, radius, color="#00FFF0", strokecolor="black", strokewidth=6) {
+        this._x = x;
+        this._y = y;
+        this._radius = radius;
+        this._hit = false;
+        this._color = color;
+        this._strokecolor = strokecolor;
+        this._strokewidth = strokewidth;
+    }
+}
+
+
+export function initialize(canvas, ctx, json){
+    var _canvas = canvas;
+    var _ctx = ctx;
+    var _json = json;
+    animate();
+}
+
 export function drawCircle(ctx, x, y, radius, hit){
     ctx.beginPath();
     ctx.arc(x,y,radius,0,Math.PI*2);
@@ -23,24 +44,31 @@ export function drawRect(ctx, x, y, angle){
     ctx.restore();
 }
 
-export function draw(canvas,ctx,json){
-    let width = canvas.width;
-    let height = canvas.height;
-    ctx.fillStyle = "#F0F0F0";
-    ctx.fillRect(0, 0, width, height);
+export function draw(){
+    let width = _canvas.width;
+    let height = _canvas.height;
+
+    _ctx.fillStyle = "#F0F0F0";
+    _ctx.fillRect(0, 0, width, height);
     // ctx.drawImage(gunimg, width-100,height/2-50,100,100);
-    drawCircle(ctx, width - 100, height / 2, 10, 2)
-    for (var i = 0; i < json.ballooninfo.hitnum; i++) {
-      drawCircle(ctx, json.ballooninfo.hit[i].x, json.ballooninfo.hit[i].y, 20, true);
+    drawCircle(_ctx, width - 100, height / 2, 10, 2)
+    for (var i = 0; i < _json.ballooninfo.hitnum; i++) {
+      drawCircle(_ctx, _json.ballooninfo.hit[i].x, _json.ballooninfo.hit[i].y, 20, true);
     }
-    for (var i = 0; i < json.ballooninfo.num - json.ballooninfo.hitnum; i++) {
-      drawCircle(ctx, json.ballooninfo.alive[i].x, json.ballooninfo.alive[i].y, 20, false);
+    for (var i = 0; i < _json.ballooninfo.num - _json.ballooninfo.hitnum; i++) {
+      drawCircle(_ctx, _json.ballooninfo.alive[i].x, _json.ballooninfo.alive[i].y, 20, false);
     }
-    ctx.beginPath();
-    ctx.moveTo(width - 100, height / 2);
-    ctx.lineTo(0, height / 2);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "red"
-    ctx.stroke();
-    ctx.closePath();
+    _ctx.beginPath();
+    _ctx.moveTo(width - 100, height / 2);
+    _ctx.lineTo(0, height / 2);
+    _ctx.lineWidth = 1;
+    _ctx.strokeStyle = "red"
+    _ctx.stroke();
+    _ctx.closePath();
+}
+
+export function animate(){
+    requestAnimationFrame(animate);
+    draw();
+    console.log("draw");
 }

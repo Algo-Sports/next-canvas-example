@@ -7,7 +7,7 @@ import GameCanvas from './components/GameCanvas'
 export default function Home() {
   return (
     <CanvasLayout>
-      <GameCanvas canvasWidth = "1000" canvasHeight = "400">
+      <GameCanvas canvaswidth = "1000" canvasheight = "800">
       </GameCanvas>
     </CanvasLayout>
   )
