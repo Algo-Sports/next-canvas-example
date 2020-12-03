@@ -1,4 +1,7 @@
 import {Wave} from './wave.js';
+import {Laser} from './laser.js';
+import * as Flatten from 'flatten-js'
+import {Plate} from './plate.js';
 
 
 class Figure{
@@ -79,13 +82,17 @@ export class GunGame{
         this.json = json;
         this._canvas = canvas;
         this._ctx = canvas.getContext('2d');
-        this._lapCount = -1;
+        this._lapCount = 0;
         this._ballrad = 20;
         this._gunpointrad = 10;
         this._gunimg = new Image();
         this._gunimg.src = "/favicon.ico";
         this._gunpoint = new Circle(this._canvas.width-100,this._canvas.height/2,10,"red","black","2");
         this._wave = new Wave(this._canvas.width,this._canvas.height,15,'rgba(31, 38, 59, 0.7)', this._json.length);
+        this._laser = new Laser(new Flatten.Point(this._canvas.width - 100, this._canvas.height/2), new Flatten.Vector(-1,0), 8);
+        this._bricks = []
+        this._bricks.push(new Plate(60,400,50,"yellow"));
+
         this.onClick = this.onClick.bind(this);
         this.animate = this.animate.bind(this);
         this._canvas.onclick = this.onClick;
@@ -96,6 +103,7 @@ export class GunGame{
     animate(){
         requestAnimationFrame(this.animate.bind(this));
         this.draw();
+        this.checkLapEnd();
     }
     
     draw(){
@@ -122,13 +130,12 @@ export class GunGame{
         for(let i = 0;i<this.balloonHit.length;i++){
             this.balloonHit[i].draw(_ctx);
         }
-        _ctx.beginPath();
-        _ctx.moveTo(width - 100, height / 2);
-        _ctx.lineTo(0, height / 2);
-        _ctx.lineWidth = 1;
-        _ctx.strokeStyle = "red"
-        _ctx.stroke();
-        _ctx.closePath();
+        this._laser.draw(_ctx, this._bricks);
+        
+        for(let i = 0;i<this._bricks.length;i++){
+            this._bricks[i].draw(_ctx);
+        }
+
     }
 
     set json(json){
@@ -136,7 +143,6 @@ export class GunGame{
     }
 
     nextLap(json){
-        console.log(json);
         this.balloonHit = [];
         this.balloonAlive = [];
         for(let i = 0;i<json.ballooninfo.hitnum;i++){
@@ -147,11 +153,21 @@ export class GunGame{
         }
     }
     
+    checkLapEnd(){
+        if(this._laser.isLapEnd()){
+            if(this._lapCount < this._json.length){
+                this._lapCount += 1;
+            }
+            this._wave.setLap(this._lapCount);
+            this.nextLap(this._json[this._lapCount-1]);
+            this._laser = new Laser(new Flatten.Point(this._canvas.width - 100, this._canvas.height/2), new Flatten.Vector(-1,0), 8);
+        }
+    }
     onClick(){
-        if(this._lapCount < this._json.length-1){
+        if(this._lapCount < this._json.length){
             this._lapCount += 1;
         }
-        this._wave.setLap(this._lapCount, this._json.length);
-        this.nextLap(this._json[this._lapCount]);
+        this._wave.setLap(this._lapCount);
+        this.nextLap(this._json[this._lapCount-1]);
     }
 }

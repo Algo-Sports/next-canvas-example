@@ -16,12 +16,12 @@ class WavePoint {
     }
 
     set nextPinPoint(nextPinPoint) {
-        this._nextPinPoint = this._STARTPOINT + ((this._canvasHeight - this._STARTPOINT)/(this._totalLaps-1)) * nextPinPoint;
+        this._nextPinPoint = this._STARTPOINT + ((this._canvasHeight - this._STARTPOINT)/(this._totalLaps-1)) * (nextPinPoint);
     }
 
     updateP() {
         if (this._pinPoint < this._nextPinPoint) {
-            this._pinPoint += this._pinSpeed;
+            this._pinPoint += Math.pow((this._nextPinPoint-this._pinPoint)/(this._canvasHeight/10),2);
         }
         this._cur = (this._cur + this._speed) % (Math.PI * 2);
         if (!this._edgeFlag) {
@@ -46,7 +46,6 @@ export class Wave {
         }
         this.points[0]._edgeFlag = true;
         this.points[this.totalPoints - 1]._edgeFlag = true;
-        console.log(this.points[0]);
     }
 
     setLap(lapCount){
