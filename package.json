@@ -9,8 +9,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
+    "@flatten-js/core": "^1.2.17",
     "antd": "^4.6.6",
+    "gl-matrix": "^3.3.0",
     "next": "9.5.3",
+    "p5": "^1.1.9",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "styled-components": "^5.2.0"

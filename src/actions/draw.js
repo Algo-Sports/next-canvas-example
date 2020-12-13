@@ -1,6 +1,6 @@
 import {Wave} from './wave.js';
 import {Laser} from './laser.js';
-import * as Flatten from 'flatten-js'
+import * as Flatten from '@flatten-js/core'
 import {Plate} from './plate.js';
 
 
@@ -82,17 +82,17 @@ export class GunGame{
         this.json = json;
         this._canvas = canvas;
         this._ctx = canvas.getContext('2d');
+        this._me = json.me;
+        this._winner = json.winner;
         this._lapCount = 0;
-        this._ballrad = 20;
+        this._lap = json.lap;
+        this._ballrad = json.gameinfo.info.ball.radius;
         this._gunpointrad = 10;
-        this._gunimg = new Image();
-        this._gunimg.src = "/favicon.ico";
-        this._gunpoint = new Circle(this._canvas.width-100,this._canvas.height/2,10,"red","black","2");
-        this._wave = new Wave(this._canvas.width,this._canvas.height,15,'rgba(31, 38, 59, 0.7)', this._json.length);
-        this._laser = new Laser(new Flatten.Point(this._canvas.width - 100, this._canvas.height/2), new Flatten.Vector(-1,0), 8);
-        this._bricks = []
-        this._bricks.push(new Plate(60,400,50,"yellow"));
-
+        this._gunpoint = new Circle(json.gameinfo.info.laser.x,json.gameinfo.info.laser.y,this._gunpointrad,"red","black","2");
+        this._wave = new Wave(json.gameinfo.info.canvas.width,json.gameinfo.info.canvas.height, json.gameinfo.info.wave.startpoint,json.gameinfo.info.wave.speed, json.gameinfo.info.wave.pinspeed ,json.gameinfo.info.wave.nums,json.gameinfo.info.wave.color, json.lap);
+        // this._laser = new Laser(new Flatten.Point(json.gameinfo.info.laser.x, json.gameinfo.info.laser.y), new Flatten.Vector(json.gameinfo.info.laser.vector.x,json.gameinfo.info.laser.vector.y), 8);
+        this._plateinfo = json.gameinfo.info.plate;
+        
         this.onClick = this.onClick.bind(this);
         this.animate = this.animate.bind(this);
         this._canvas.onclick = this.onClick;
@@ -116,8 +116,6 @@ export class GunGame{
         _ctx.fillRect(0, 0, width, height);
 
         this._wave.draw(_ctx);
-
-        _ctx.drawImage(this._gunimg, width-100,height/2-50,100,100);
         this._gunpoint.draw(_ctx);
 
 
@@ -130,7 +128,7 @@ export class GunGame{
         for(let i = 0;i<this.balloonHit.length;i++){
             this.balloonHit[i].draw(_ctx);
         }
-        this._laser.draw(_ctx, this._bricks);
+        this._laser.draw(_ctx);
         
         for(let i = 0;i<this._bricks.length;i++){
             this._bricks[i].draw(_ctx);
@@ -142,32 +140,46 @@ export class GunGame{
         this._json = json;
     }
 
-    nextLap(json){
+    nextLap(){
+        let myresult = this._json[this._me];
+        let now = this._lapCount-1;
         this.balloonHit = [];
         this.balloonAlive = [];
-        for(let i = 0;i<json.ballooninfo.hitnum;i++){
-            this.balloonHit[i] = new Balloon(json.ballooninfo.hit[i].x, json.ballooninfo.hit[i].y, this._ballrad,true);
+        for(let i = 0;i<myresult.userresult[now].hit_ball.length;i++){
+            this.balloonHit[i] = new Balloon(this._json.gameinfo.ball[myresult.userresult[now].hit_ball[i]][0], this._json.gameinfo.ball[myresult.userresult[now].hit_ball[i]][1], this._ballrad,true);
         }
-        for(let i = 0;i<json.ballooninfo.num - json.ballooninfo.hitnum;i++){
-            this.balloonAlive[i] = new Balloon(json.ballooninfo.alive[i].x, json.ballooninfo.alive[i].y, this._ballrad,false);
+        for(let i = 0;i<this._json.gameinfo.ball.length;i++){
+            if(i in myresult.userresult[now].hit_ball){
+                // continue;
+            }
+            this.balloonAlive[i] = new Balloon(this._json.gameinfo.ball[i][0], this._json.gameinfo.ball[i][1], this._ballrad,false);
         }
+        
+        this._bricks = []
+
+        for(let i = 0;i<myresult.useroutput[now].plate.length;i++){
+            this._bricks[i] = new Plate(myresult.useroutput[now].plate[i].x,myresult.useroutput[now].plate[i].y,myresult.useroutput[now].plate[i].angle,this._plateinfo);
+        }
+
+        this._laser = new Laser(new Flatten.Point(this._json.gameinfo.info.laser.x, this._json.gameinfo.info.laser.y), myresult.userresult[now].hit_point, 8);
+        
     }
     
     checkLapEnd(){
         if(this._laser.isLapEnd()){
-            if(this._lapCount < this._json.length){
+            if(this._lapCount < this._lap){
                 this._lapCount += 1;
             }
             this._wave.setLap(this._lapCount);
-            this.nextLap(this._json[this._lapCount-1]);
-            this._laser = new Laser(new Flatten.Point(this._canvas.width - 100, this._canvas.height/2), new Flatten.Vector(-1,0), 8);
+            this.nextLap();
         }
     }
     onClick(){
-        if(this._lapCount < this._json.length){
+        if(this._lapCount < this._lap){
             this._lapCount += 1;
         }
+        console.log(this._lapCount);
         this._wave.setLap(this._lapCount);
-        this.nextLap(this._json[this._lapCount-1]);
+        this.nextLap();
     }
 }

@@ -1,12 +1,12 @@
 import {Point} from './point.js'
-import * as Flatten from 'flatten-js'
+import * as Flatten from '@flatten-js/core'
 
 
 export class Plate{
-    constructor(x,y,angle,color){
-        this._width = 100;
-        this._height = 20;
-        this._color = color;
+    constructor(x,y,angle,info){
+        this._width = info.width;
+        this._height = info.height;
+        this._color = info.color;
         this._center = new Flatten.Point(x,y);
         this._upleftpoint = new Flatten.Point(x-this._width/2, y-this._height/2);
         this._uprightpoint = new Flatten.Point(x+this._width/2, y-this._height/2);

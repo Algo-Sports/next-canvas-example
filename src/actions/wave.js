@@ -1,15 +1,15 @@
 import { Point } from './point.js';
 class WavePoint {
-    constructor(index, x, height, totalPoints, totalLaps) {
+    constructor(index, x, height, startpoint, speed, pinspeed , totalPoints, totalLaps) {
         this._point = new Point(x, 0);
         this._canvasHeight = height;
         this._totalPoints = totalPoints;
         this._totalLaps = totalLaps;
         this._cur = ((Math.PI) / totalPoints) * index;
-        this._STARTPOINT = 200; // 기본 시작 y
+        this._STARTPOINT = startpoint; // 기본 시작 y
         this._nextPinPoint = this._STARTPOINT; 
-        this._pinPoint = 0;
-        this._pinSpeed = 0.6;
+        this._pinPoint = pinspeed;
+        this._pinSpeed = speed;
         this._speed = 0.1;
         this._max = Math.random() * 20 + 10; // random 할까?
         this._edgeFlag = false;
@@ -33,7 +33,7 @@ class WavePoint {
 }
 
 export class Wave {
-    constructor(width, height, totalPoints, color, totalLaps) {
+    constructor(width, height, startpoint, speed, pinspeed, totalPoints, color, totalLaps) {
         this.canvasWidth = width;
         this.canvasHeight = height;
         this.points = [];
@@ -42,7 +42,7 @@ export class Wave {
         this.pointGap = width / (totalPoints - 1);
         this.color = color;
         for (let i = 0; i < totalPoints; i++) {
-            this.points.push(new WavePoint(i + 1, this.pointGap * i, height, totalPoints, totalLaps));
+            this.points.push(new WavePoint(i + 1, this.pointGap * i, height, startpoint, speed, pinspeed , totalPoints, totalLaps));
         }
         this.points[0]._edgeFlag = true;
         this.points[this.totalPoints - 1]._edgeFlag = true;
