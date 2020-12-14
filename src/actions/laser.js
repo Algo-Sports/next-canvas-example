@@ -39,6 +39,10 @@ export class Laser {
             this._P = this._startPoint.clone();
             this._Q = this._startPoint.clone();
             this._v = new Flatten.Vector(this._startPoint, this._endPoint);
+            while((this._v.x != 0 && Math.abs(this._v.x) < 1) || (this._v.y != 0 && Math.abs(this._v.y) < 1)){
+                this._v.x *= 100000;
+                this._v.y *= 100000;
+            }
             this._v = this._v.normalize();
         }
         else {
@@ -47,20 +51,26 @@ export class Laser {
     }
 
     draw(ctx) {
-        // debugger;
-        this.update();
         if (this._stop) return;
         ctx.beginPath();
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 1;
+        if(this._complete.length){
+            ctx.moveTo(this._complete[0].ps.x, this._complete[0].ps.y);
+        }
+        else{
+            ctx.moveTo(this._P.x, this._P.y);
+        }
         for (let segment of this._complete) {
-            ctx.moveTo(segment.ps.x, segment.pe.y);
+            // ctx.moveTo(segment.ps.x, segment.pe.y);
             ctx.lineTo(segment.pe.x, segment.pe.y);
+            ctx.stroke();
         }
         ctx.moveTo(this._P.x, this._P.y);
         ctx.lineTo(this._Q.x, this._Q.y);
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 1;
         ctx.stroke();
         ctx.closePath();
+        this.update();
 
     }
 }

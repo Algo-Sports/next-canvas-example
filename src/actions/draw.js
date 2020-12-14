@@ -38,17 +38,23 @@ class Circle extends Figure{
 class Balloon extends Circle{
     constructor(x,y,radius,hit=false, strokecolor="black", strokewidth=6,z_index="10"){
         let color = "#78E1D6"
-        if(hit){
-            color = "rgba(135,148,190,0.7)";
-        }
         super(x,y,radius,color,strokecolor,strokewidth);
-        this._hit = hit;
+        this.sethit(hit);
         this._auraRadMax = 45;
         this._auraRadMin = 20;
         this._auraSpeed = 0.2;
         this._auraRad =  this._auraRadMax;
         this._auraSlice = 30;
         this._auraAngle = Math.random() * Math.PI*2;
+    }
+
+    sethit(hit){
+        this._hit = hit;
+        if(this._hit){
+            this._color = "rgba(135,148,190,0.7)";
+        }else{
+            this._color = "#78E1D6"
+        }
     }
 
     drawAura(ctx){
@@ -119,8 +125,9 @@ export class GunGame{
         this._gunpoint.draw(_ctx);
 
 
-        for (let i = 0; i < this.balloonAlive.length; i++) {
-            this.balloonAlive[i].draw(_ctx);
+
+        for (let ba of this.balloonAlive) {
+            ba.draw(_ctx);
         }
         for(let i = 0;i<this.balloonAlive.length;i++){
             this.balloonAlive[i].drawAura(_ctx);
@@ -128,10 +135,19 @@ export class GunGame{
         for(let i = 0;i<this.balloonHit.length;i++){
             this.balloonHit[i].draw(_ctx);
         }
-        this._laser.draw(_ctx);
-        
         for(let i = 0;i<this._bricks.length;i++){
             this._bricks[i].draw(_ctx);
+        }
+        for(let p of this._bricks){
+            p.draw(_ctx);
+        }
+        
+        this._laser.draw(_ctx);
+        for(let i of this._json[this._me].userresult[this._lapCount-1].hit_point){
+            _ctx.beginPath()
+            _ctx.fillStyle = "green"
+            _ctx.arc(i.x,i.y,2,0,Math.PI*2);
+            _ctx.fill();
         }
 
     }
@@ -149,10 +165,10 @@ export class GunGame{
             this.balloonHit[i] = new Balloon(this._json.gameinfo.ball[myresult.userresult[now].hit_ball[i]][0], this._json.gameinfo.ball[myresult.userresult[now].hit_ball[i]][1], this._ballrad,true);
         }
         for(let i = 0;i<this._json.gameinfo.ball.length;i++){
-            if(i in myresult.userresult[now].hit_ball){
-                // continue;
+            if(myresult.userresult[now].hit_ball.indexOf(i) >= 0){
+                continue;
             }
-            this.balloonAlive[i] = new Balloon(this._json.gameinfo.ball[i][0], this._json.gameinfo.ball[i][1], this._ballrad,false);
+            this.balloonAlive.push(new Balloon(this._json.gameinfo.ball[i][0], this._json.gameinfo.ball[i][1], this._ballrad,false));
         }
         
         this._bricks = []
